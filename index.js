@@ -30,9 +30,22 @@ async function run() {
 
         // load data from mongodb
         app.get('/event', async (req, res) => {
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+
             const query = {};
             const cursor = eventsCollection.find(query);
-            const events = await cursor.toArray();
+            console.log(cursor);
+            let events;
+
+            if (page || size) {
+                events = await cursor
+                    .skip(page * size)
+                    .limit(size)
+                    .toArray();
+            } else {
+                events = await cursor.toArray();
+            }
             res.send(events);
         });
 
@@ -56,6 +69,12 @@ async function run() {
             const newVolunteer = req.body;
             const result = await volunteerCollection.insertOne(newVolunteer);
             res.send(result);
+        });
+
+        // count the events number
+        app.get('/eventscount', async (req, res) => {
+            const count = await eventsCollection.countDocuments();
+            res.send({ count });
         });
     } finally {
         // await client.close();
