@@ -71,6 +71,23 @@ async function run() {
             res.send(result);
         });
 
+        // load volunteer information from volunteerInfo
+        app.get('/volunteer', async (req, res) => {
+            const query = {};
+            const cursor = volunteerCollection.find(query);
+            const volunteers = await cursor.toArray();
+            res.send(volunteers);
+        });
+
+        // deleting event from volunteerInfo
+        app.delete('/volunteer/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const query = { _id: new ObjectId(id) };
+            const result = await volunteerCollection.deleteOne(query);
+            res.send(result);
+        });
+
         // count the events number
         app.get('/eventscount', async (req, res) => {
             const count = await eventsCollection.countDocuments();
