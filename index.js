@@ -63,18 +63,17 @@ async function run() {
 
             const query = {};
             const cursor = eventsCollection.find(query);
-            console.log(cursor);
-            let events;
+            // console.log(cursor);
+            // let events;
+            const count = await eventsCollection.estimatedDocumentCount();
 
-            if (page || size) {
-                events = await cursor
-                    .skip(page * size)
-                    .limit(size)
-                    .toArray();
-            } else {
-                events = await cursor.toArray();
-            }
-            res.send(events);
+            const events = await cursor
+                .skip(page * size)
+                .limit(size)
+                .toArray();
+
+            console.log(count);
+            res.send({ data: events, count: count });
         });
 
         // load data to mongodb
@@ -125,10 +124,10 @@ async function run() {
         });
 
         // count the events number
-        app.get('/eventscount', async (req, res) => {
+        /* app.get('/eventscount', async (req, res) => {
             const count = await eventsCollection.countDocuments();
             res.send({ count });
-        });
+        }); */
     } finally {
         // await client.close();
     }
